@@ -1,6 +1,5 @@
 import express from "express";
 import { createLeadsById, getAllLeads, deleteLead, updateLeadsById, getAdmins } from "../helper.js";
-import sgMail from "@sendgrid/mail"
 import nodemailer from "nodemailer";
 
 const router = express.Router();
@@ -17,13 +16,13 @@ router.route("/").get(async (request, response) => {
         var transporter=nodemailer.createTransport({
             service:'gmail',
             auth:{
-                user:"test1hmail@gmail.com",
-                pass:"bcpn beqk zixw utji"
+                user:process.env.ACC_MAIL,
+                pass:process.env.ACC_PASS
             }
         });
         
         var mailOptions={
-            from:"test1hmail@gmail.com",
+            from:process.env.ACC_MAIL,
             to:email,
             subject:"sending email from nodejs",
             html: `<h2>Below is the new Lead generated from our end.</h2>

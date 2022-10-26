@@ -1,10 +1,9 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import sgMail from "@sendgrid/mail"
 import { client } from "../index.js"
 import nodemailer from "nodemailer";
 const router = express.Router();
-const CLIENT_URL = "http://localhost:3000"
+const CLIENT_URL = "https://lively-gelato-3eb13d.netlify.app"
 
 
 router.route('/').put(async (req, res) => {
@@ -13,7 +12,7 @@ router.route('/').put(async (req, res) => {
     const existUser = await client.db("crm").collection("users").findOne({ email: email }) //to check whether the user is present or not
 
     if (!existUser) {                                          //return if email not exists
-        return res.status(400).send({ message: "User with this email doesn't exists." })
+        return res.send({ message: "User with this email doesn't exists." })
     }
 
     //creating token
@@ -33,25 +32,18 @@ router.route('/').put(async (req, res) => {
         html: `<h2>Please click on given link to reset your password</h2>
                <p>${CLIENT_URL}/reset-password/${token}</p>`
     };
-    transporter.sendMail(mailOptions, ((err,info)=>{
-        if(err){
-            console.log(err);
-        }
-        else{
-            console.log("Email sent:" + info.response);
-        }
-    }))
+ 
 
     try {
         await client.db("crm").collection("users").updateOne({ email: email }, { $set: { resetLink: token } })      //update the token in db
-        return sgMail
-            .send(msg)
-            .then(() => {
-                return res.send({ message: "Email has been sent!" })        //mail will send only if the token is valid
-            })
-            .catch((error) => {
-                return res.send({ message: error })
-            })
+        transporter.sendMail(mailOptions, ((err,info)=>{
+            if(err){
+                res.send({ message: err })
+            }
+            else{
+                res.send({ message: "Email has been sent!" }) 
+            }
+        }))
 
     }
     catch (err) {

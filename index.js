@@ -36,7 +36,7 @@ export const client = await createConnect();
 // ------------------------------------------------------------------------------
 
 app.get("/", (request, response) => {
-    response.send("Hello World...");
+    response.send("Hi! Welcome to CRM App....");
 })
 
 // Authentication
